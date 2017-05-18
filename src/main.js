@@ -1,3 +1,7 @@
+// define color constants
+const red = '#F00';
+const blue = '#00F';
+
 let getRandomInt = (min, max) => {
 	  min = Math.ceil(min);
 	    max = Math.floor(max);
@@ -136,13 +140,13 @@ s.bind('clickNode', (e) => {
 			break;
 		case 4:
 			// make this the accept node
-			e.data.node.color = '#F00'; // red
+			e.data.node.color = red;
 			s.refresh();
 			clickMode = 1;
 			break;
 		case 5:
 			// make this the start node
-			e.data.node.color = '#00F'; // blue
+			e.data.node.color = blue;
 			s.refresh();
 			clickMode = 1;
 			break;
@@ -166,30 +170,85 @@ document.getElementById('nodeButton').onclick = (e) => {
 };
 
 let getGraph = () => {
-	console.log(s.graph.nodes());
+	let nodes = s.graph.nodes();
+	let edges = s.graph.edges();
+
+	edges.forEach((e) => {
+		let transitionString = e.label.split(' ');
+		e.read = transitionString[0];
+		e.write = transitionString[1];
+		e.directionInString = (transitionString[2] == 'R') ? 1 :
+				      (transitionString[2] == 'L') ? -1 : 0;
+
+	});
+
+	let start, accept;
+	nodes.forEach((n) => {
+		start = (n.color === blue) ? n : start;
+		accept = (n.color === red) ? n : accept;
+
+		n.edges = [];
+
+		edges.forEach((e) => {
+			if (e.source === n.id) {
+				n.edges.push(e);
+			}
+		});
+	});
+
+	return {edges, nodes, startNode: start, acceptNode: accept};
 };
 
 let simulate = (inString) => {
+	let graph = getGraph();
+	console.log(graph);
+	let stringPos = 1;
+	inString = 'D' + inString + 'D'; // put the starting and ending deltas in place
 
+	let startIndex = graph.nodes.indexOf(graph.startNode);
+
+	console.log("start index is: " + startIndex);
+	for (let i = 0; i < graph.nodes[startIndex].edges.length; i++) {
+		if (graph.nodes[startIndex].edges[i].read === inString[stringPos]) {
+			// reading the character
+			inString[stringPos] = graph.nodes[startIndex].edges[i].write;
+			stringPos += graph.nodes[startIndex].edges[i].directionInString;
+
+			// move to state
+			startIndex = graph.nodes.findIndex((element) => {
+				element.id == graph.nodes[startIndex].edges[i].target;
+			});
+
+			console.log("moving to node at index: " + startIndex);
+
+			// reset counter
+			i = -1;
+		}
+	}
+	return (graph.nodes[startIndex].id == graph.acceptNode.id);
 };
 
-// new edge functions
+// button listeners
 document.getElementById('edgeButton').onclick = (e) => {
 	console.log("setting click mode to 2");
 	clickMode = 2;
 };
+
 document.getElementById('deleteButton').onclick = (e) => {
 	console.log("setting click mode to 3");
 	clickMode = 3;
 };
+
 document.getElementById('runButton').onclick = (e) => {
 	console.log("running TM");
 	let inString = prompt("Enter a string to run on Turing Machine");
-	simulate(inString);
+	console.log(simulate(inString));
 };
+
 document.getElementById('acceptButton').onclick = (e) => {
 	clickMode = 4;
 };
+
 document.getElementById('startButton').onclick = (e) => {
 	clickMode = 5;
 };
