@@ -1,0 +1,19 @@
+{
+  "name": "theory-of-computation2",
+  "version": "1.0.0",
+  "description": "another attempt at this stupid thing",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "babel src -d build"
+  },
+  "author": "Elijah Verdoorn",
+  "license": "MIT",
+  "dependencies": {
+    "sigma": "^1.2.0"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.24.1",
+    "babel-preset-env": "^1.4.0"
+  }
+}
