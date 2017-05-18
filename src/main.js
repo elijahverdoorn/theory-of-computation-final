@@ -165,6 +165,10 @@ document.getElementById('nodeButton').onclick = (e) => {
 	s.refresh();
 };
 
+let getGraph = () => {
+	console.log(s.graph.nodes());
+};
+
 let simulate = (inString) => {
 
 };
