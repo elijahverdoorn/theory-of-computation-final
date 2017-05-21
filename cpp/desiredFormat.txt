@@ -1,0 +1,5 @@
+# of states
+start state
+accept state
+tape alphabet symbols
+F T RWM <- from, to, readSymbol, writeSymbol, moveSymbol
