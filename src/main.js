@@ -8,8 +8,8 @@ let getRandomInt = (min, max) => {
 	      return Math.floor(Math.random() * (max - min)) + min;
 };
 
-let numNodes = 10;
-let numEdges = 10;
+let numNodes = 3;
+let numEdges = 0;
 
 let nodes = Array.from(Array(numNodes).keys()).map((i) => ({
 	id: `n${i}`,
@@ -204,6 +204,7 @@ let simulate = (inString) => {
 	console.log(graph);
 	let stringPos = 1;
 	inString = 'D' + inString + 'D'; // put the starting and ending deltas in place
+	inString = inString.split(''); // convert to array to enable [] and assignment
 
 	let startIndex = graph.nodes.indexOf(graph.startNode);
 
@@ -215,9 +216,10 @@ let simulate = (inString) => {
 			stringPos += graph.nodes[startIndex].edges[i].directionInString;
 
 			// move to state
-			startIndex = graph.nodes.findIndex((element) => {
-				element.id == graph.nodes[startIndex].edges[i].target;
-			});
+			startIndex = graph.nodes.map((x) => {return x.id}).indexOf(graph.nodes[startIndex].edges[i].target);
+			//startIndex = graph.nodes.findIndex((element) => {
+				//element.id == graph.nodes[startIndex].edges[i].target;
+			//});
 
 			console.log("moving to node at index: " + startIndex);
 
@@ -225,7 +227,7 @@ let simulate = (inString) => {
 			i = -1;
 		}
 	}
-	return (graph.nodes[startIndex].id == graph.acceptNode.id);
+	return {isAccepted: (graph.nodes[startIndex].id == graph.acceptNode.id), tapeVal: inString};
 };
 
 // button listeners
@@ -242,7 +244,9 @@ document.getElementById('deleteButton').onclick = (e) => {
 document.getElementById('runButton').onclick = (e) => {
 	console.log("running TM");
 	let inString = prompt("Enter a string to run on Turing Machine");
-	console.log(simulate(inString));
+	let result = simulate(inString);
+	let outString = `The string ${inString} is ${(result.isAccepted) ? 'accepted' : 'rejected'} with a tape value of ${result.tapeVal}.`
+	alert(outString);
 };
 
 document.getElementById('acceptButton').onclick = (e) => {
