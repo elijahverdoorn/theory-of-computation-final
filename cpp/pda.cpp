@@ -5,20 +5,20 @@
 #include <string>
 #include <utility>
 
-std::vector<std::pair<std::string, std::string>> validTransitions = {
-		{"A1", "1B"},
-		{"A_", "A_"},
-		{"A0", "$B"},
-		{"$B", "0A"},
-		{"B_", "_A"},
-		{"C0", "0C"},
-		{"C1", "1C"},
-		{"_1", "1_"},
-		{"_D", "E_"},
-		{"1E", "F_"},
-		{"1F", "F1"},
-		{"0F", "F0"},
-		{"F$", "$F"}
+std::vector<std::pair<std::pair<std::string, std::string>, int>> validTransitions = {
+	{{"A1", "1B"}, -1}, // the number is the position of the start of the string
+	{{"A_", "A_"}, 0},
+	{{"A0", "$C"}, 0},
+	{{"$B", "0A"}, -1},
+	{{"B_", "_A"}, 0},
+	{{"C0", "0C"}, 0},
+	{{"C1", "1D"}, 0},
+	{{"D1", "1D"}, 0},
+	{{"_D", "E_"}, -1},
+	{{"1E", "F_"}, -1},
+	{{"1F", "F1"}, -1},
+	{{"0F", "F0"}, -1},
+	{{"F$", "$F"}, 0}
 	};
 
 int main()
@@ -32,11 +32,9 @@ int main()
 	std::stack<char> s1Stack;
 	for (char c : inChars)
 	{
-		std::cout << c;
 		// insert into stack
 		s1Stack.push(c);
 	}
-	std::cout << std::endl;
 
 	std::cout << "Enter the second string: ";
 	std::cin >> s2;
@@ -44,15 +42,28 @@ int main()
 	std::vector<char> s2Chars(s2.begin(), s2.end());
 	for (int i = 0; i < s2Chars.size(); i++)
 	{
+		std::cout << "Read " << s1Stack.top() << " from stack and " << s2Chars[i] << " from array." << std::endl;
 		if (s2Chars[i] == s1Stack.top())
 		{
 			s1Stack.pop();
 		} else {
 			// the character is not the same - We need to examine this one situation to see if it's valid
-			if (std::string(s2Chars[i] + s2Chars[i+1]) == std::string(s1stack)
+			for (auto t : validTransitions)
 			{
+				std::cout << "    Comparing s2's " << s2[i + t.second] << " == " << t.first.first[0] << std::endl;
+				std::cout << "    Comparing s2's " << s2[i + 1 + t.second] << " == " << t.first.first[1] << std::endl;
+				std::cout << "    Comparing s1's " << s1[i + t.second] << " == " << t.first.second[0] << std::endl;
+				std::cout << "    Comparing s1's " << s1[i + 1 + t.second] << " == " << t.first.second[1] << std::endl;
 
+				if (s1[i + t.second] == t.first.first[0] && s1[i + t.second + 1] == t.first.first[1] && s2[i + t.second] == t.first.second[0] && s2[i + 1 + t.second] == t.first.second[1])
+				{
+					std::cout << "Accepted" << std::endl;
+					return 0;
+				}
+				std::cout << std::endl;
 			}
+			std::cout << "Rejected" << std::endl;
+			return 0;
 		}
 	}
 }
